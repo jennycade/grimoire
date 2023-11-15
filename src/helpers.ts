@@ -1,3 +1,6 @@
+export const isStringArray = (obj: unknown): obj is string[] =>
+  Array.isArray(obj) && obj.every((el) => typeof el === "string");
+
 // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules
 const ORDINAL_RULES = new Intl.PluralRules("en-US", { type: "ordinal" });
 

@@ -1,6 +1,10 @@
 import { Card, Descriptions } from "antd";
 
-import { formatOrdinal, snakeCaseToSentenceCase } from "../helpers";
+import {
+  formatOrdinal,
+  isStringArray,
+  snakeCaseToSentenceCase,
+} from "../helpers";
 import type { Spell as SpellType } from "../types";
 import { DescriptionsItemType } from "antd/es/descriptions";
 
@@ -16,7 +20,14 @@ const TRAITS = [
   "higher_level",
 ] as const;
 
-const STYLE_PROPS = {
+const spellLevel = (level: number) => {
+  if (level === 0) {
+    return "cantrip";
+  }
+  return formatOrdinal(level) + " level";
+};
+
+const DESCRIPTION_STYLE_PROPS = {
   colon: false,
   column: 1,
 };
@@ -26,21 +37,49 @@ type SpellProps = {
 };
 
 function Spell({ spell }: SpellProps) {
-  const descriptionItems: DescriptionsItemType[] = TRAITS.map((trait) => ({
-    key: trait,
-    label: snakeCaseToSentenceCase(trait),
-    children: spell[trait],
-  }));
+  const descriptionItems: DescriptionsItemType[] = TRAITS.map((traitName) => {
+    const trait = spell[traitName];
+
+    if (!trait) {
+      return null;
+    }
+
+    const item = {
+      key: traitName,
+      label: snakeCaseToSentenceCase(traitName),
+      children: trait,
+    };
+
+    if (trait === true) {
+      return {
+        ...item,
+        children: item.label,
+      };
+    }
+
+    if (isStringArray(trait)) {
+      return {
+        ...item,
+        children: trait.join(", "),
+      };
+    }
+
+    return item;
+  }).filter((item) => item !== null) as DescriptionsItemType[];
 
   return (
     <Card title={spell.name}>
       <p>
-        {formatOrdinal(spell.level)} level{" "}
-        {spell.school.name.toLocaleLowerCase()}
+        {spellLevel(spell.level)} {spell.school.name.toLocaleLowerCase()}
       </p>
-      <p>{spell.desc}</p>
 
-      <Descriptions {...STYLE_PROPS} items={descriptionItems} />
+      <>
+        {spell.desc.map((paragraph) => (
+          <p key="paragraph">{paragraph}</p>
+        ))}
+      </>
+
+      <Descriptions {...DESCRIPTION_STYLE_PROPS} items={descriptionItems} />
     </Card>
   );
 }
