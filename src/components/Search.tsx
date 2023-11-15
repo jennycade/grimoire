@@ -1,13 +1,28 @@
 import React from "react";
-import { Form, Input } from "antd";
+import { Button, Form, Select } from "antd";
 
-const { Search: AntdSearch } = Input;
+import spellData from "../data/5e-SRD-Spells.json";
+
+const spellOptions = spellData
+  .map((spell) => ({ label: spell.name, value: spell.name }))
+  .sort();
 
 function Search() {
   return (
-    <Form.Item label="Search for a spell" colon={false}>
-      <AntdSearch allowClear placeholder="Spell name" />
-    </Form.Item>
+    <Form>
+      <Form.Item label="Search for a spell" colon={false}>
+        <Select
+          allowClear
+          showSearch
+          placeholder="Spell name"
+          options={spellOptions}
+        />
+      </Form.Item>
+
+      <Button type="primary" htmlType="submit">
+        Add to spellbook
+      </Button>
+    </Form>
   );
 }
 
