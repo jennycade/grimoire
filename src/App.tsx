@@ -1,6 +1,7 @@
 import React from "react";
 import { Typography } from "antd";
 import Search from "./components/Search";
+import { SpellbookProvider } from "./contexts/SpellbookContext";
 
 const { Title } = Typography;
 
@@ -9,7 +10,9 @@ function App() {
     <div className="App">
       <Title>Spellbook</Title>
 
-      <Search />
+      <SpellbookProvider>
+        <Search />
+      </SpellbookProvider>
     </div>
   );
 }
