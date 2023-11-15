@@ -14,11 +14,16 @@ type FormFields = {
 
 function Search() {
   const { addSpell } = useContext(SpellbookContext);
+
+  const [form] = Form.useForm<FormFields>();
+
   const onFinish = (values: FormFields) => {
     addSpell(values.spellName);
+    form.resetFields();
   };
+
   return (
-    <Form onFinish={onFinish}>
+    <Form form={form} onFinish={onFinish}>
       <Form.Item label="Search for a spell" colon={false} name="spellName">
         <Select
           allowClear
