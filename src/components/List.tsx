@@ -1,14 +1,17 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { SpellbookContext } from "../contexts/SpellbookContext";
+import Spell from "./Spell";
 
 function List() {
   const { spells } = useContext(SpellbookContext);
   return (
-    <ul>
+    <>
       {spells.map((spell) => (
-        <li key={spell.name}>{spell.name}</li>
+        <React.Fragment key={spell.name}>
+          <Spell spell={spell} />
+        </React.Fragment>
       ))}
-    </ul>
+    </>
   );
 }
 

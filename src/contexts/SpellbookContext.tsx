@@ -1,7 +1,6 @@
 import { type ReactNode, createContext, useState } from "react";
 import spellData from "../data/5e-SRD-Spells.json";
-
-type Spell = (typeof spellData)[number];
+import type { Spell } from "../types";
 
 type SpellbookContextType = {
   spells: Spell[];

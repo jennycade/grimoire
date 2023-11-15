@@ -8,7 +8,7 @@ const { Title } = Typography;
 
 function App() {
   return (
-    <div className="App">
+    <div className="App" style={{ margin: "0 100px" }}>
       <Title>Spellbook</Title>
 
       <SpellbookProvider>
