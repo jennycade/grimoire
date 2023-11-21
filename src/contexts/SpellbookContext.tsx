@@ -1,6 +1,13 @@
-import { type ReactNode, createContext, useState } from "react";
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
 import spellData from "../data/5e-SRD-Spells.json";
 import type { Spell } from "../types";
+import { LocalStorageContext } from "./LocalStorageContext";
 
 type SpellbookContextType = {
   spells: Spell[];
@@ -17,7 +24,17 @@ type SpellbookProviderProps = {
 };
 
 export const SpellbookProvider = ({ children }: SpellbookProviderProps) => {
-  const [spells, setSpells] = useState<Spell[]>([]);
+  const { store, overwriteStore } = useContext(LocalStorageContext);
+
+  const [spells, setSpells] = useState<Spell[]>(
+    Array.isArray(store) ? store : []
+  );
+
+  useEffect(() => {
+    if (Array.isArray(store)) {
+      setSpells(store);
+    }
+  }, [store]);
 
   const addSpell = (newSpellName: Spell["name"]) => {
     if (spells.some((existingSpell) => existingSpell.name === newSpellName)) {
@@ -29,7 +46,10 @@ export const SpellbookProvider = ({ children }: SpellbookProviderProps) => {
     if (!newSpell) {
       throw new Error(`Spell not found: ${newSpellName}`);
     }
-    setSpells((oldSpells) => [...oldSpells, newSpell]);
+
+    const newSpells = [...spells, newSpell];
+    setSpells(newSpells);
+    overwriteStore(newSpells);
   };
 
   return (
