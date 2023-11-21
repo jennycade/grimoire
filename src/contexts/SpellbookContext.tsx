@@ -12,11 +12,13 @@ import { LocalStorageContext } from "./LocalStorageContext";
 type SpellbookContextType = {
   spells: Spell[];
   addSpell: (spellName: Spell["name"]) => void;
+  removeSpell: (spellName: Spell["name"]) => void;
 };
 
 export const SpellbookContext = createContext<SpellbookContextType>({
   spells: [],
   addSpell: () => null,
+  removeSpell: () => null,
 });
 
 type SpellbookProviderProps = {
@@ -36,6 +38,11 @@ export const SpellbookProvider = ({ children }: SpellbookProviderProps) => {
     }
   }, [store]);
 
+  const saveSpells = (newSpells: Spell[]) => {
+    setSpells(newSpells);
+    overwriteStore(newSpells);
+  };
+
   const addSpell = (newSpellName: Spell["name"]) => {
     if (spells.some((existingSpell) => existingSpell.name === newSpellName)) {
       throw new Error(`Spell already saved in spellbook: ${newSpellName}`);
@@ -48,12 +55,20 @@ export const SpellbookProvider = ({ children }: SpellbookProviderProps) => {
     }
 
     const newSpells = [...spells, newSpell];
-    setSpells(newSpells);
-    overwriteStore(newSpells);
+    saveSpells(newSpells);
+  };
+
+  const removeSpell = (spellName: Spell["name"]) => {
+    const newSpells = spells.filter((spell) => spell.name !== spellName);
+
+    if (newSpells.length === spells.length) {
+      throw new Error(`Spell not found: ${spellName}`);
+    }
+    saveSpells(newSpells);
   };
 
   return (
-    <SpellbookContext.Provider value={{ spells, addSpell }}>
+    <SpellbookContext.Provider value={{ spells, addSpell, removeSpell }}>
       {children}
     </SpellbookContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { Card, Descriptions } from "antd";
+import { Button, Card, Descriptions } from "antd";
 
 import {
   formatOrdinal,
@@ -7,6 +7,8 @@ import {
 } from "../helpers";
 import type { Spell as SpellType } from "../types";
 import { DescriptionsItemType } from "antd/es/descriptions";
+import { useContext } from "react";
+import { SpellbookContext } from "../contexts/SpellbookContext";
 
 const TRAITS = [
   "casting_time",
@@ -30,6 +32,14 @@ const spellLevel = (level: number) => {
 const DESCRIPTION_STYLE_PROPS = {
   colon: false,
   column: 1,
+};
+
+const RemoveButton = ({ spellName }: { spellName: SpellType["name"] }) => {
+  const { removeSpell } = useContext(SpellbookContext);
+  const handleClick = () => {
+    removeSpell(spellName);
+  };
+  return <Button onClick={handleClick}>remove</Button>;
 };
 
 type SpellProps = {
@@ -68,7 +78,7 @@ function Spell({ spell }: SpellProps) {
   }).filter((item) => item !== null) as DescriptionsItemType[];
 
   return (
-    <Card title={spell.name}>
+    <Card title={spell.name} extra={<RemoveButton spellName={spell.name} />}>
       <p>
         {spellLevel(spell.level)} {spell.school.name.toLocaleLowerCase()}
       </p>
