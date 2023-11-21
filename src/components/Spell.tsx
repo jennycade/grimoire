@@ -15,7 +15,7 @@ const TRAITS = [
   "range",
   "components",
   "duration",
-  // "classes[].name",
+  "classes[].name",
   "material",
   "ritual",
   "concentration",
@@ -42,39 +42,63 @@ const RemoveButton = ({ spellName }: { spellName: SpellType["name"] }) => {
   return <Button onClick={handleClick}>remove</Button>;
 };
 
+type RenderSimpleTraitArgs = {
+  traitName: Exclude<(typeof TRAITS)[number], "classes[].name">;
+  spell: SpellType;
+};
+
+const renderSimpleTrait = ({ spell, traitName }: RenderSimpleTraitArgs) => {
+  const trait = spell[traitName];
+
+  if (!trait) {
+    return null;
+  }
+
+  const item = {
+    key: traitName,
+    label: snakeCaseToSentenceCase(traitName),
+    children: trait,
+  };
+
+  if (trait === true) {
+    return {
+      ...item,
+      children: item.label,
+    };
+  }
+
+  if (isStringArray(trait)) {
+    return {
+      ...item,
+      children: trait.join(", "),
+    };
+  }
+
+  return item;
+};
+
+const renderClassNames = (spell: SpellType) => {
+  const trait = spell.classes
+    .map((castingClass) => castingClass.name)
+    .join(", ");
+  return {
+    key: "classes",
+    label: "Classes",
+    children: trait,
+  };
+};
+
 type SpellProps = {
   spell: SpellType;
 };
 
 function Spell({ spell }: SpellProps) {
   const descriptionItems: DescriptionsItemType[] = TRAITS.map((traitName) => {
-    const trait = spell[traitName];
-
-    if (!trait) {
-      return null;
+    if (traitName === "classes[].name") {
+      return renderClassNames(spell);
     }
 
-    const item = {
-      key: traitName,
-      label: snakeCaseToSentenceCase(traitName),
-      children: trait,
-    };
-
-    if (trait === true) {
-      return {
-        ...item,
-        children: item.label,
-      };
-    }
-
-    if (isStringArray(trait)) {
-      return {
-        ...item,
-        children: trait.join(", "),
-      };
-    }
-
-    return item;
+    return renderSimpleTrait({ spell, traitName });
   }).filter((item) => item !== null) as DescriptionsItemType[];
 
   return (
